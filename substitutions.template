@@ -1,0 +1,20 @@
+# ImsMDrivePlus asyn model 3 substitutions file
+
+# SREV (not shown) is the number of steps per revolution is 200 by
+#    default
+#
+
+# For SREV:
+#    2048 = internal encoder (EQ)
+#     250 = external encoder, NUMERIK-JENA
+#     200 = external encoder, Renishaw
+#   51200 = no encoder
+
+# CXI DG4 Support Motion Stand (DG4) Substitution file
+
+
+file "$(MOTOR)/db/basic_asyn_motor.db"
+{basic_asyn_motor}
+
+file "$(TOP)/db/IMS_extra.db"
+{ims_extra}

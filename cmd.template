@@ -1,0 +1,56 @@
+#!{binPath}
+#
+# make sure the motors are in echo mode 2:
+# $ socat - TCP4:192.168.0.5:7434
+# XEM=2
+# ZEM=2
+# <CTRL-J>
+#
+# In serial comm. (above) print motor Z parameters with:
+# Z PR AL
+#
+# When the ioc is running, check availablePVs with `dbl`, for example:
+# epics> dbl
+# IMS:mxOffset
+# IMS:mxResolution
+# IMS:mzOffset
+# IMS:mzResolution
+# IMS:IOC:1:IMS_S
+# IMS:mxDirection
+# IMS:mzDirection
+# IMS:mx
+# IMS:mz
+
+< {envPath}
+
+# change to the 'motor-R7-3-1/modules/motorIms/iocs/imsIOC' dir
+cd "${{TOP}}"
+
+# Register all support components
+dbLoadDatabase "dbd/ims.dbd"
+ims_registerRecordDeviceDriver pdbbase
+
+# Motors substitutions, customize this for your motor
+dbLoadTemplate "{substitutionsPath}"
+
+# Configure asyn communication port, first
+# drvAsynIPPortConfigure(IOPortName, port, priority, disable auto-connect, no process EOS)
+drvAsynIPPortConfigure("{portName}", "{addressWithPort}", 0, 0, 0 )
+
+# Configure one controller per motor, each controller just has 1 axis
+# motorPortName, portName, deviceName, movingPollPeriod, idlePollPeriod
+{ImsMDrivePlusCreateController}
+
+# Optional: Enable tracing
+{asynSetTraceIOMask}
+{asynSetTraceMask}
+
+# motorUtil (allstop & alldone)
+#dbLoadRecords("$(MOTOR)/db/motorUtil.db", "P=ims:")
+
+# Initialize the IOC and start processing records
+iocInit()
+
+# motorUtil (allstop & alldone)
+#motorUtilInit("ims:")
+

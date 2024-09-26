@@ -1,0 +1,46 @@
+# for (i = 0; i < MOTORS; i++) { printf("Motor %s: address %s; lower_limit %g; upper_limit %g; offset %g\n", motor_name(i), motor_par(i, "device_id"), get_lim(i, -1), get_lim(i, 1), motor_par(i, "offset")); }
+Motor bstopdummy: address dummymot; lower_limit -360; upper_limit 360; offset 0
+Motor pddummy: address dummymot; lower_limit -5000; upper_limit 1000; offset 0
+Motor s1bot: address 192.168.0.5:7431; lower_limit -50; upper_limit 50; offset -0.367402
+Motor s1top: address 192.168.0.5:7431; lower_limit -50.0003; upper_limit 49.9997; offset 3.49017
+Motor s1hl: address 192.168.0.5:7431; lower_limit -50; upper_limit 50; offset 1.44985
+Motor s1hr: address 192.168.0.5:7431; lower_limit -50; upper_limit 50; offset 0.127783
+Motor s2bot: address 192.168.0.5:7432; lower_limit -50; upper_limit 50; offset 0.0999512
+Motor s2top: address 192.168.0.5:7432; lower_limit -50.0589; upper_limit 49.9411; offset -0.488877
+Motor s2hl: address 192.168.0.5:7432; lower_limit -50; upper_limit 50; offset -0.758359
+Motor s2hr: address 192.168.0.5:7432; lower_limit -50; upper_limit 50; offset 0.957148
+Motor s3bot: address 192.168.0.5:7433; lower_limit -50; upper_limit 50; offset -0.0469824
+Motor s3top: address 192.168.0.5:7433; lower_limit -50; upper_limit 50; offset -0.93999
+Motor s3hl: address 192.168.0.5:7433; lower_limit -50; upper_limit 50; offset -1.71776
+Motor s3hr: address 192.168.0.5:7433; lower_limit -50; upper_limit 50; offset 0.997588
+Motor vg1: address slit; lower_limit -30; upper_limit 30; offset 0
+Motor vp1: address slit; lower_limit -30; upper_limit 30; offset 0
+Motor hg1: address slit; lower_limit -30; upper_limit 30; offset 0
+Motor hp1: address slit; lower_limit -30; upper_limit 30; offset 0
+Motor vg3: address slit; lower_limit -30; upper_limit 30; offset 0
+Motor vp3: address slit; lower_limit -30; upper_limit 30; offset 0
+Motor hg3: address slit; lower_limit -30; upper_limit 30; offset 0
+Motor hp3: address slit; lower_limit -30; upper_limit 30; offset 0
+Motor vg2: address slit; lower_limit -30; upper_limit 30; offset 0
+Motor vp2: address slit; lower_limit -30; upper_limit 30; offset 0
+Motor hg2: address slit; lower_limit -30; upper_limit 30; offset 0
+Motor hp2: address slit; lower_limit -30; upper_limit 30; offset 0
+Motor oldysam: address 192.168.0.5:7434; lower_limit -52; upper_limit 52; offset -0.37999
+Motor oldzsam: address 192.168.0.5:7434; lower_limit -88; upper_limit 15.9999; offset 2.92963e-05
+Motor bsr: address 192.168.0.5:7435; lower_limit -37; upper_limit 37; offset 291.747
+Motor bsz: address 192.168.0.5:7435; lower_limit -15; upper_limit 10; offset -0.351181
+Motor detx: address 192.168.0.5:7435; lower_limit -830; upper_limit 1670; offset 1499.81
+Motor dety: address 192.168.0.5:7435; lower_limit -121.137; upper_limit 118.863; offset 0
+Motor detz: address 192.168.0.5:7435; lower_limit -95; upper_limit 95; offset 0
+Motor dual: address 192.168.0.5:7436; lower_limit -1000; upper_limit 1000; offset -14.385
+Motor bsh: address bshv; lower_limit -1000; upper_limit 1000; offset 0
+Motor bsv: address bshv; lower_limit -1000; upper_limit 1000; offset 0
+Motor Heavy Z: address ?; lower_limit -2; upper_limit 4.3; offset 0
+Motor fine yaw: address ?; lower_limit -10000; upper_limit 10000; offset 3.99876
+Motor GI yaw: address ?; lower_limit -360; upper_limit 360; offset 70.2101
+Motor GI Roll: address ?; lower_limit -25; upper_limit 25; offset 0
+Motor GI Pitch: address ?; lower_limit -10; upper_limit 10; offset 0
+Motor old2zsam: address ?; lower_limit 0; upper_limit 150; offset 75
+Motor zsam: address ?; lower_limit 0; upper_limit 150; offset -75
+Motor ysam: address ?; lower_limit 0; upper_limit 150; offset -75
+

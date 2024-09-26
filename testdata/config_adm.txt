@@ -1,0 +1,214 @@
+# ID @(#)getinfo.c	6.16  07/24/20 CSS
+# Misc things
+
+# Device nodes
+SDEV_0	 = SOCKET:192.168.0.5:7443 9600 raw
+SDEV_1	 = /dev/USBP201 115200 raw
+SDEV_2	 = SOCKET:192.168.0.5:7442 57600 raw
+RS_MDRIVE	 = SOCKET:192.168.0.5:7431 9600 64
+RS_MDRIVE	 = SOCKET:192.168.0.5:7432 9600 64
+RS_MDRIVE	 = SOCKET:192.168.0.5:7433 9600 64
+RS_MDRIVE	 = SOCKET:192.168.0.5:7440 9600 64
+RS_MDRIVE	 = SOCKET:192.168.0.5:7435 9600 64
+RS_MDRIVE	 = SOCKET:192.168.0.5:7436 9600 64
+RS_MDRIVE	 = SOCKET:192.168.0.5:7437 9600 64
+RS_TMCL	 = SOCKET:192.168.0.5:7438 300 100
+STATE = OFF
+PSE_MAC_MOT	 = slit 4
+PSE_MAC_MOT	 = slit2 4
+PSE_MAC_MOT	 = slit3 4
+PSE_MAC_MOT	 = bshv 2
+PSE_MAC_MOT	 = dummymot 2
+VM_EPICS_M1	 = mc0: 6
+STATE = OFF
+SW_SFTWARE	 = 1 POLL
+# CAMAC Slot Assignments
+#  CA_name_unit = slot [crate_number]
+# Motor  cntrl      steps sign slew   base backl accel nada flags   mne  name
+MOT000 = MAC_MOT:4/0    100  1 76800  100 -12800  125    0 0x003    bstop  bstopdummy
+MOT001 = MAC_MOT:4/1    100  1 76800  100 -12800  125    0 0x003       pd  pddummy
+MOT002 =  MDRIVE:0/10 102400  1 76800  100 12800  500    0 0x003    s1bot  s1bot
+MOTPAR:init_sequence = S1=2,0,1;S2=3,0,1  
+MOTPAR:units = mm
+MOT003 =  MDRIVE:0/11 102400 -1 76800  100 12800  125    0 0x003    s1top  s1top
+MOTPAR:init_sequence = S1=2,0,1;S2=3,0,1
+MOTPAR:units = mm
+MOT004 =  MDRIVE:0/12 102400 -1 76800  100 12800  125    0 0x003     s1hl  s1hl
+MOTPAR:init_sequence = S1=2,0,1;S2=3,0,1
+MOTPAR:units = mm
+MOT005 =  MDRIVE:0/13 102400  1 76800  100 -12800  125    0 0x003     s1hr  s1hr
+MOTPAR:init_sequence = S1=2,0,1;S2=3,0,1
+MOTPAR:units = mm
+MOT006 =  MDRIVE:1/14 102400  1 76800  100 -12800  125    0 0x003    s2bot  s2bot
+MOTPAR:init_sequence = S1=2,0,1;S2=3,0,1
+MOTPAR:units = mm
+MOT007 =  MDRIVE:1/15 102400 -1 76800  100 12800  125    0 0x003    s2top  s2top
+MOTPAR:init_sequence = S1=2,0,1;S2=3,0,1
+MOTPAR:units = mm
+MOT008 =  MDRIVE:1/16 102400 -1 76800  100 12800  125    0 0x003     s2hl  s2hl
+MOTPAR:init_sequence = S1=2,0,1;S2=3,0,1
+MOTPAR:units = mm
+MOT009 =  MDRIVE:1/17 102400  1 76800  100 -12800  125    0 0x003     s2hr  s2hr
+MOTPAR:init_sequence = S1=2,0,1;S2=3,0,1
+MOTPAR:units = mm
+MOT010 =  MDRIVE:2/18 102400  1 76800  100 -12800  125    0 0x003    s3bot  s3bot
+MOTPAR:init_sequence = S1=2,0,1;S2=3,0,1  
+MOTPAR:units = mm
+MOT011 =  MDRIVE:2/19 102400 -1 76800  100 12800  125    0 0x003    s3top  s3top
+MOTPAR:init_sequence = S1=2,0,1;S2=3,0,1
+MOTPAR:units = mm
+MOT012 =  MDRIVE:2/22 102400 -1 76800  100 12800  125    0 0x003     s3hl  s3hl
+MOTPAR:init_sequence = S1=2,0,1;S2=3,0,1
+MOTPAR:units = mm
+MOT013 =  MDRIVE:2/23 102400  1 76800  100 -12800  125    0 0x003     s3hr  s3hr
+MOTPAR:init_sequence = S1=2,0,1;S2=3,0,1
+MOTPAR:units = mm
+MOT014 = MAC_MOT:0/0/0  16000  1 12000 8000 8000  125    0 0x003      vg1  vg1
+MOTPAR:slop = 1
+MOTPAR:blade1 = s1top
+MOTPAR:blade2 = s1bot
+MOT015 = MAC_MOT:0/0/1  16000  1 12000 8000 8000  125    0 0x003      vp1  vp1
+MOTPAR:slop = 1
+MOT016 = MAC_MOT:0/1/0  16000  1 12000 8000 4000  125    0 0x003      hg1  hg1
+MOTPAR:slop = 1
+MOTPAR:blade1 = s1hl
+MOTPAR:blade2 = s1hr
+MOT017 = MAC_MOT:0/1/1  16000  1 12000 8000 4000  125    0 0x003      hp1  hp1
+MOTPAR:slop = 1
+MOT018 = MAC_MOT:0/2/0  16000  1 12000 8000 4000  125    0 0x003      vg3  vg3
+MOTPAR:slop = 1
+MOTPAR:blade1 = s2top
+MOTPAR:blade2 = s2bot
+MOT019 = MAC_MOT:0/2/1  16000  1 12000 8000 4000  125    0 0x003      vp3  vp3
+MOTPAR:slop = 1
+MOT020 = MAC_MOT:0/3/0  16000  1 12000 8000 4000  125    0 0x003      hg3  hg3
+MOTPAR:slop = 1
+MOTPAR:blade1 = s2hl
+MOTPAR:blade2 = s2hr
+MOT021 = MAC_MOT:0/3/1  16000  1 12000 8000 4000  125    0 0x003      hp3  hp3
+MOTPAR:slop = 1
+MOT022 = MAC_MOT:0/4/0  16000  1 12000 8000 4000  125    0 0x003      vg2  vg2
+MOTPAR:slop = 1
+MOTPAR:blade1 = s3top
+MOTPAR:blade2 = s3bot
+MOT023 = MAC_MOT:0/4/1  16000  1 12000 8000 4000  125    0 0x003      vp2  vp2
+MOTPAR:slop = 1
+MOT024 = MAC_MOT:0/5/0  16000  1 12000 8000 4000  125    0 0x003      hg2  hg2
+MOTPAR:slop = 1
+MOTPAR:blade1 = s3hl
+MOTPAR:blade2 = s3hr
+MOT025 = MAC_MOT:0/5/1  16000  1 12000 8000 4000  125    0 0x003      hp2  hp2
+MOTPAR:slop = 1
+MOT026 =  MDRIVE:3/33  34133 -1 51200  100 -34133  125    0 0x003  oldysam  oldysam
+MOTPAR:init_sequence = S1=2,0,1;S2=3,0,1
+MOTPAR:units = mm
+MOT027 =  MDRIVE:3/35  17067  1 32000  100 17067  175    0 0x003  oldzsam  oldzsam
+MOTPAR:init_sequence = S1=2,0,1;S2=3,0,1 
+MOTPAR:units = mm
+MOT028 =  MDRIVE:4/25    320 -1  4000 2000 -1500  250    0 0x003      bsr  bsr
+MOTPAR:init_sequence = S1=2,1,0;S2=3,1,0
+MOT029 =  MDRIVE:4/26   2540  1  4000 2000 -5000  125    0 0x003      bsz  bsz
+MOTPAR:init_sequence = S1=2,1,0;S2=3,1,0
+MOT030 =  MDRIVE:4/21 170.605 -1 12000 4000 4000 1000    0 0x003     detx  detx
+MOTPAR:init_sequence = S1=2,1,0;S2=3,1,0
+MOT031 =  MDRIVE:4/30 4020.75 -1 32000  200 12000  125    0 0x003     dety  dety
+MOTPAR:init_sequence = S1=2,1,0;S2=3,1,0
+MOT032 =  MDRIVE:4/31  28800 -1 76000  200 -100000  125    0 0x003     detz  detz
+MOTPAR:init_sequence = S1=2,1,0;S2=3,1,0
+MOT033 =  MDRIVE:5/32  25600  1 150000  200 -51200  125    0 0x003     dual  dual
+MOT034 = MAC_MOT:3/0  16000  1 150000  200 -51200  125    0 0x003      bsh  bsh
+MOT035 = MAC_MOT:3/1  16000  1 150000  200 -51200  125    0 0x003      bsv  bsv
+MOTPAR:units = mm
+MOT036 =    TMCL:0/0/0 409600  1 50000  100 10000  500    0 0x003   zheavy  Heavy Z
+MOTPAR:encoder_step_size = 800
+MOTPAR:rotary = 0
+MOTPAR:disable_limit_checks = 0
+MOTPAR:par6 = 80
+MOTPAR:par24 = 1
+MOTPAR:par25 = 1
+MOTPAR:par140 = 8
+MOTPAR:par193 = 6
+MOTPAR:par194 = 50000
+MOTPAR:par195 = 1000
+MOT037 =    TMCL:0/1/5  87946  1 100000  100 10000  500    0 0x003  fineyaw  fine yaw
+MOTPAR:encoder_step_size = 800
+MOTPAR:rotary = 0
+MOTPAR:disable_limit_checks = 0
+MOTPAR:par6 = 20
+MOTPAR:par24 = 1
+MOTPAR:par25 = 1
+MOTPAR:par140 = 8
+MOTPAR:par193 = 6
+MOTPAR:par194 = 100000
+MOTPAR:par195 = 10000
+MOT038 =    TMCL:0/1/4  12800  1 100000  100 10000  500    0 0x003    yawgi  GI yaw
+MOTPAR:encoder_step_size = 800
+MOTPAR:rotary = 0
+MOTPAR:disable_limit_checks = 1
+MOTPAR:par195 = 1000
+MOTPAR:par194 = 50000
+MOTPAR:par193 = 2
+MOTPAR:par140 = 8
+MOTPAR:par25 = 0
+MOTPAR:par24 = 0
+MOTPAR:par6 = 90
+MOTPAR:par12 = 1
+MOTPAR:par13 = 1
+MOT039 =    TMCL:0/1/3  35000  1 76800  100 12800  500    0 0x003   rollgi  GI Roll
+MOTPAR:encoder_step_size = 800
+MOTPAR:rotary = 0
+MOTPAR:disable_limit_checks = 1
+MOTPAR:par6 = 80
+MOTPAR:par24 = 0
+MOTPAR:par25 = 0
+MOTPAR:par193 = 2
+MOTPAR:par194 = 50000
+MOTPAR:par12 = 1
+MOTPAR:par13 = 1
+MOTPAR:par195 = 1000
+MOTPAR:par140 = 8
+MOT040 =    TMCL:0/1/2 134000  1 100000  100 12800  500    0 0x003  pitchgi  GI Pitch
+MOTPAR:encoder_step_size = 800
+MOTPAR:rotary = 0
+MOTPAR:disable_limit_checks = 1
+MOTPAR:par6 = 30
+MOTPAR:par24 = 1
+MOTPAR:par25 = 1
+MOTPAR:par193 = 2
+MOTPAR:par194 = 50000
+MOTPAR:par195 = 1000
+MOTPAR:par12 = 1
+MOTPAR:par13 = 1
+MOT041 =    TMCL:0/1/1  25600 -1 76800  100 12800  500    0 0x003  old2zsa  old2zsam
+MOTPAR:encoder_step_size = 800
+MOTPAR:rotary = 0
+MOTPAR:disable_limit_checks = 1
+MOTPAR:par6 = 200
+MOTPAR:par24 = 0
+MOTPAR:par25 = 0
+MOTPAR:par193 = 2
+MOTPAR:par194 = 50000
+MOTPAR:par195 = 1000
+MOT042 = EPICS_M2:0/1  25600  1 153600  100 12800  500    0 0x003     zsam  zsam
+MOTPAR:encoder_step_size = 800
+MOTPAR:rotary = 0
+MOTPAR:disable_limit_checks = 0
+MOTPAR:misc_par_1 = zsam
+MOT043 = EPICS_M2:0/2  25600  1 153600  100 12800  500    0 0x003     ysam  ysam
+MOTPAR:encoder_step_size = 800
+MOTPAR:rotary = 0
+MOTPAR:disable_limit_checks = 0
+MOTPAR:misc_par_1 = ysam
+# Counter   ctrl unit chan scale flags    mne  name
+CNT000 =  SFTWARE  0  0   1000 0x001      sec  Seconds
+CNT001 =     NONE  0  1      1 0x000    pdint  PDInt
+CNT002 =     NONE  1  3      1 0x000   pilint  PilatusInt
+CNT003 =     NONE  0  2      1 0x000  julabos  JulaboS
+CNT004 =     NONE  0  3      1 0x000  julaboe  JulaboE
+CNT005 =     NONE  0  5      1 0x000   pt100s  Pt100S
+CNT006 =     NONE  0  6      1 0x000   pt100e  Pt100E
+CNT007 =     NONE  1  1      1 0x000  linkams  LinkamS
+CNT008 =     NONE  1  2      1 0x000  linkame  LinkamE
+CNT009 =     NONE  1  3      1 0x000  mks_vac  Vacuum
+CNT010 =     NONE  1  5      1 0x000     refl  Reflect
+CNT011 =     NONE  1  6      1 0x000      enc  Encoder
