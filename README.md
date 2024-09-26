@@ -6,6 +6,38 @@ Some helpful links:
 - [SPEC motor parameters config_adm reference](https://certif.com/spec_help/config_adm.html#motor-parameters)
 - [MDrive Serial Programming Reference](https://novantaims.com/downloads/manuals/MCode.pdf#%5B%7B%22num%22%3A106%2C%22gen%22%3A0%7D%2C%7B%22name%22%3A%22FitH%22%7D%2C1010%5D)
 
+## Usage
+
+Config files with imaginary network addresses can be found in the [testdata](testdata) subdir. Store your real files which where extracted from SPEC in subdir *cfg* out of the git tree (that subfolder is set to be ignored by GIT). For regenerating the IOC files, run the following (feel free to replace *testdata* by *cfg*):
+
+    ./convert.py -c testdata/config_adm.txt -a testdata/spec_motor_aliases.md -l testdata/limits.txt -p ../synapps/support/motor-R7-3-1/modules/motorIms
+
+The `-p` argument expects an existing path to the motorIms package source tree structure. The scripts searches for the *ims* binary and the *envPaths* file which should exist there after building it successfully. We used the [synApps package](https://github.com/EPICS-synApps) and our [modified assemble script](https://github.com/BAMresearch/EPICS-synApps-assemble) helps with building everything successfully on a Linux Ubuntu system.
+
+Some help is shown as usual by:
+
+    ./convert.py -h
+ 
+It creates or updates files in the *generated* subfolder:
+ 
+    generated/
+    ├── moxa1.cmd
+    ├── moxa1.substitutions
+    ├── moxa2.cmd
+    ├── moxa2.substitutions
+    ├── moxa3.cmd
+    ├── moxa3.substitutions
+    ├── moxa4.cmd
+    ├── moxa4.substitutions
+    ├── moxa5.cmd
+    ├── moxa5.substitutions
+    ├── moxa6.cmd
+    └── moxa6.substitutions
+ 
+Start one IOC for the connected motors like this (in this case for *old[xy]sam*):
+ 
+    ./generated/moxa4.cmd
+
 ## Translate SPEC motor settings to IOC motor record fields
 
 ### Additional info by Anja
