@@ -107,10 +107,11 @@ def configureParser() -> argparse.ArgumentParser:
     needsConfigAdm(generateParser)
     needsLimits(generateParser)
     needsImsPath(generateParser)
-    toggleParser = subparsers.add_parser("toggle", help="Toggle Echo Mode (EM) on a given port.")
-    toggleParser.set_defaults(mode="toggle")
-    toggleParser.add_argument("port", type=str, help="Port number or name to toggle connected devices on.")
-    needsAddressesAliases(toggleParser)
+    emParser = subparsers.add_parser("echomode", help="Set Echo Mode (EM) on a given port.")
+    emParser.set_defaults(mode="echomode")
+    emParser.add_argument("port", type=str, help="Port number or name to toggle connected devices on.")
+    emParser.add_argument("value", type=int, help="Mode to set.", choices=[1, 2])
+    needsAddressesAliases(emParser)
     return parser
 
 
@@ -409,7 +410,7 @@ def getMotorsByAddress(motors: List[dict]):
     return motorsByAddress
 
 
-def toggleEM(host, port, deviceName):
+def setEM(host, port, deviceName, value):
     import socket
     try:
         port = int(port, 0)
@@ -426,7 +427,7 @@ def toggleEM(host, port, deviceName):
         send(s, f"{deviceName} PR EM")
         em = recv(s)
         print("Current Echo Mode:", em)
-        emNew = int(em) ^ 3 # XOR with 0xff, only 2 bits needed
+        emNew = max(1, min(2, value))
         print("Setting Echo Mode to", emNew, "...")
         send(s, f"{deviceName} EM {emNew}") # does not return anything in EM=1
         send(s, f"{deviceName} PR EM")
@@ -436,7 +437,7 @@ def toggleEM(host, port, deviceName):
         print("New echo mode:", em)
 
 
-def toggleEMbyPort(deviceNamesByAddress: dict, portOrName):
+def setEMbyPort(deviceNamesByAddress: dict, portOrName, value):
     host, port, deviceNames = None, None, []
     for addr, names in deviceNamesByAddress.items():
         host, port, portName = getPortName(addr)
@@ -447,7 +448,7 @@ def toggleEMbyPort(deviceNamesByAddress: dict, portOrName):
     if not deviceNames:
         raise ValueError(f"No devices found for given {portOrName=}!")
     for dn in deviceNames:
-        toggleEM(host, port, dn)
+        setEM(host, port, dn, value)
 
 
 def main(args: List[str] = None):
@@ -461,9 +462,9 @@ def main(args: List[str] = None):
     print("Addresses of motor device names:")
     pprint(addresses)
 
-    if args.mode == "toggle":
+    if args.mode == "echomode":
         deviceNamesByAddress = getDeviceNamesByAddress(addresses, deviceNames)
-        toggleEMbyPort(deviceNamesByAddress, args.port)
+        setEMbyPort(deviceNamesByAddress, args.port, args.value)
         return
     # elif args.mode == "generate":
     print("Limits of motors:")
