@@ -191,3 +191,8 @@ Initial test settings (records) for motors *oldysam* and *oldzsam* stored under 
 
 
 Updated values are derived from formulae above, limits as shown in the spec config.
+
+## To do
+
+- to run multiple IOCs on a single machine, some kind of gateway is required
+  - otherwise, on start up, epics shows a warning that another port has to be claimed but it will not be found (and thus used) by the client side
