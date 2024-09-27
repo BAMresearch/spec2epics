@@ -217,7 +217,7 @@ def substitutions(motors):
         "INIT": 4,
     }
     value = {
-        "P": "IMS:",
+        "P": "ims:",
         "N": "",
         "M": '"m$(N)"',
         "DTYP": '"asynMotor"',
@@ -247,8 +247,9 @@ def substitutions(motors):
     for motor in motors:
         # pprint(motor)
         value["N"] = f'"{motor["devName"]}"'
+        value["M"] = f'"{motor["name"]}"'
         value["PORT"] = "IMS" + motor["devName"]
-        value["DESC"] = f'"{motor["cntrl"]} ({motor["name"]})"'  # quoted
+        value["DESC"] = f'"{motor["cntrl"].split(":")[0]}.{motor["devName"]}"'  # quoted
         fieldWidth["DESC"] = max(len(value["DESC"]), fieldWidth["DESC"])
         value["EGU"] = motor.get("units", "mm")
         value["DIR"] = "Pos" if motor["sign"] > 0 else "Neg"
