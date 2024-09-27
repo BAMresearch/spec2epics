@@ -13,7 +13,7 @@
 # CXI DG4 Support Motion Stand (DG4) Substitution file
 
 
-file "$(MOTOR)/db/basic_asyn_motor.db"
+file "{motorDbPathNew}"
 {basic_asyn_motor}
 
 file "$(TOP)/db/IMS_extra.db"

@@ -244,6 +244,7 @@ def substitutions(motors):
         "MRES": 12,
         "PREC": 4,
         "OFF": 8,
+        "HVEL": 8,
         "INIT": 4,
     }
     value = {
@@ -267,6 +268,7 @@ def substitutions(motors):
         "MRES": 0,
         "PREC": 4,
         "OFF": 0,
+        "HVEL": 0,
         "INIT": "",
         "DEV": "IMS",
         "AREA": "IOC",
@@ -297,6 +299,7 @@ def substitutions(motors):
         if "init_sequence" in motor:
             value["INIT"] = f'"{motor["init_sequence"]}"'
         value["OFF"] = motor["offset"]
+        value["HVEL"] = value["VELO"] * 0.3 # third of normal speed for now
         motorValues.append(value.copy())
 
     def formatString(key, fieldWidth):
@@ -351,6 +354,7 @@ def getPortName(addressWithPort):
 
 def genIOCconfig(motorsByAddress: dict, imsPath: Path, outpath: Path):
     # pprint(motorsByAddress)
+    outpath.mkdir(mode=0o755, exist_ok=True)
     # find IOC binary and other paths
     iocPath = imsPath / "iocs" / "imsIOC"
     binPath = list(iocPath.glob("**/bin/**/ims"))
@@ -361,8 +365,6 @@ def genIOCconfig(motorsByAddress: dict, imsPath: Path, outpath: Path):
         raise RuntimeError(f"envPath file could not be within {imsPath}!")
     binPath = binPath[0].resolve()
     envPath = envPath[0].resolve()
-    # print(f"{binPath=}")
-    # print(f"{envPath=}")
     # read templates
     templateCmd = ""
     with open("cmd.template") as fd:
@@ -370,7 +372,30 @@ def genIOCconfig(motorsByAddress: dict, imsPath: Path, outpath: Path):
     templateSubs = ""
     with open("substitutions.template") as fd:
         templateSubs = fd.read()
-    outpath.mkdir(mode=0o755, exist_ok=True)
+    # for testing
+    print("templateSubs:")
+    print(templateSubs)
+    # print(f"{binPath=}")
+    print(f"{envPath=}")
+    with open(envPath) as fd:
+        motorPath = [line for line in fd.readlines() if "MOTOR" in line]
+    print(motorPath)
+    if motorPath:
+        motorPath = motorPath[0].split('"')[3]
+    motorDbPath = Path(motorPath) / "db/basic_asyn_motor.db"
+    print(motorDbPath, motorDbPath.is_file())
+    with open(motorDbPath) as fd:
+        motorDb = fd.readlines()
+    idx = [i for i, line in enumerate(motorDb) if "field(INIT" in line]
+    if idx:
+        idx = idx[0]
+        motorDb.insert(idx, "\tfield(HVEL,\"$(HVEL)\")\n")
+        motorDb.insert(idx, "\tfield(OFF,\"$(OFF)\")\n")
+    pprint(motorDb)
+    motorDbPathNew = (outpath / motorDbPath.name).resolve()
+    print(motorDbPathNew)
+    motorDbPathNew.write_text("".join(motorDb))
+
     for addressWithPort, motors in motorsByAddress.items():
         _, port, portName = getPortName(addressWithPort)
         substitutionsPath = f"{portName}.substitutions"
