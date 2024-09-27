@@ -10,7 +10,7 @@ Some helpful links:
 
 Config files with imaginary network addresses can be found in the [testdata](testdata) subdir. Store your real files which where extracted from SPEC in subdir *cfg* out of the git tree (that subfolder is set to be ignored by GIT). For regenerating the IOC files, run the following (feel free to replace *testdata* by *cfg*):
 
-    ./convert.py -c testdata/config_adm.txt -a testdata/spec_motor_aliases.md -l testdata/limits.txt -p ../synapps/support/motor-R7-3-1/modules/motorIms
+    ./convert.py -c testdata/config_adm.txt -a testdata/addressesAliases.md -l testdata/limits.txt -p ../synapps/support/motor-R7-3-1/modules/motorIms
 
 The `-p` argument expects an existing path to the motorIms package source tree structure. The scripts searches for the *ims* binary and the *envPaths* file which should exist there after building it successfully. We used the [synApps package](https://github.com/EPICS-synApps) and our [modified assemble script](https://github.com/BAMresearch/EPICS-synApps-assemble) helps with building everything successfully on a Linux Ubuntu system.
 
