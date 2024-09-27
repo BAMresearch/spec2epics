@@ -100,7 +100,7 @@ def configureParser() -> argparse.ArgumentParser:
             (Released under a MIT license.)
             """,
     )
-    subparsers = parser.add_subparsers(title='Available sub-commands', required=True)
+    subparsers = parser.add_subparsers(title="Available sub-commands", required=True)
     generateParser = subparsers.add_parser("generate", help="Generate IOC scripts.")
     generateParser.set_defaults(mode="generate")
     needsAddressesAliases(generateParser)
@@ -109,7 +109,9 @@ def configureParser() -> argparse.ArgumentParser:
     needsImsPath(generateParser)
     emParser = subparsers.add_parser("echomode", help="Set Echo Mode (EM) on a given port.")
     emParser.set_defaults(mode="echomode")
-    emParser.add_argument("port", type=str, help="Port number or name to toggle connected devices on.")
+    emParser.add_argument(
+        "port", type=str, help="Port number or name to toggle connected devices on."
+    )
     emParser.add_argument("value", type=int, help="Mode to set.", choices=[1, 2])
     needsAddressesAliases(emParser)
     return parser
@@ -161,10 +163,15 @@ def readLimits(filename: Path):
     # get lines and separating from motor names
     allwords = [line.split(": ") for line in infn.read_text().splitlines()]
     # splitting key/value fields following the motor names
-    allwords = [[line[0]] + line[1].split("; ") for line in allwords if line and len(line) > 1 and line[0].startswith("Motor")]
+    allwords = [
+        [line[0]] + line[1].split("; ")
+        for line in allwords
+        if line and len(line) > 1 and line[0].startswith("Motor")
+    ]
     # return the key/value dicts indexed by the motor names only
-    return {" ".join(line[0].split()[1:]): dict(item.split() for item in line[1:])
-            for line in allwords}
+    return {
+        " ".join(line[0].split()[1:]): dict(item.split() for item in line[1:]) for line in allwords
+    }
 
 
 def convertValues(motorList: List[dict]):
@@ -176,7 +183,9 @@ def convertValues(motorList: List[dict]):
             motorList[i][key] = convertValue(value)
 
 
-def motorsFromSPEC(filename: Path, deviceNames: dict, addresses: dict, limits: dict, filterCntrl=None):
+def motorsFromSPEC(
+    filename: Path, deviceNames: dict, addresses: dict, limits: dict, filterCntrl=None
+):
     """Parses config_adm output from SPEC to a list of dicts of key/value pairs of configuration
     settings for each MDRIVE motor.
     *filename*: Text file of `config_adm` output."""
@@ -190,7 +199,7 @@ def motorsFromSPEC(filename: Path, deviceNames: dict, addresses: dict, limits: d
     motors = []
     for start, end in pairwise(motorIndices):
         # first line should contain the common fields
-        fieldValues = lines[start].replace("=", "").split(maxsplit=len(fieldNames)-1)
+        fieldValues = lines[start].replace("=", "").split(maxsplit=len(fieldNames) - 1)
         # print(lines[start:end], len(fieldNames), len(fieldValues))
         motor = dict(zip(fieldNames, fieldValues))
         # print(f"{motor=}")
@@ -304,18 +313,20 @@ def substitutions(motors):
     def formatMotorParams(fieldWidth, motorValues):
         indent = "  "
         # format string of each row
-        lineFormat = "{{ " + ", ".join([formatString(key, fw)
-                                        for key, fw in fieldWidth.items()]) + " }}"
+        lineFormat = (
+            "{{ " + ", ".join([formatString(key, fw) for key, fw in fieldWidth.items()]) + " }}"
+        )
         # header with labels only
         body = [lineFormat.format(**dict(zip(fieldWidth.keys(), fieldWidth.keys())))]
         # format values of each motor
         for motorValue in motorValues:
-            formatted = {key: formatValue(fieldWidth[key], val)
-                         for key, val in motorValue.items()
-                         if key in fieldWidth}
+            formatted = {
+                key: formatValue(fieldWidth[key], val)
+                for key, val in motorValue.items()
+                if key in fieldWidth
+            }
             body.append(lineFormat.format(**formatted))
-        return ("{\n" + f"{indent}pattern\n{indent}"
-                + f"\n{indent}".join(body) + "\n}")
+        return "{\n" + f"{indent}pattern\n{indent}" + f"\n{indent}".join(body) + "\n}"
 
     basic_asyn_motor = formatMotorParams(fieldWidth, motorValues)
     # generate IMS_extra table
@@ -330,16 +341,18 @@ def substitutions(motors):
     ims_extra = formatMotorParams(fieldWidth, motorValues)
     return basic_asyn_motor, ims_extra
 
+
 def getPortName(addressWithPort):
     host, port = addressWithPort.split(":")
     port = int(port, 0)
     portName = f"moxa{port%100}"
     return host, port, portName
 
+
 def genIOCconfig(motorsByAddress: dict, imsPath: Path, outpath: Path):
-    #pprint(motorsByAddress)
+    # pprint(motorsByAddress)
     # find IOC binary and other paths
-    iocPath = imsPath/"iocs"/"imsIOC"
+    iocPath = imsPath / "iocs" / "imsIOC"
     binPath = list(iocPath.glob("**/bin/**/ims"))
     envPath = list(iocPath.glob("**/envPaths"))
     if not binPath or not binPath[0].is_file():
@@ -348,8 +361,8 @@ def genIOCconfig(motorsByAddress: dict, imsPath: Path, outpath: Path):
         raise RuntimeError(f"envPath file could not be within {imsPath}!")
     binPath = binPath[0].resolve()
     envPath = envPath[0].resolve()
-    #print(f"{binPath=}")
-    #print(f"{envPath=}")
+    # print(f"{binPath=}")
+    # print(f"{envPath=}")
     # read templates
     templateCmd = ""
     with open("cmd.template") as fd:
@@ -370,7 +383,9 @@ def genIOCconfig(motorsByAddress: dict, imsPath: Path, outpath: Path):
         for motor in motors:
             dn = motor["devName"]
             motorPortName = f"IMS{dn}"
-            createController.append(f'ImsMDrivePlusCreateController("{motorPortName}", "{portName}", "{dn}", 200, 5000)')
+            createController.append(
+                f'ImsMDrivePlusCreateController("{motorPortName}", "{portName}", "{dn}", 200, 5000)'
+            )
             asynSetTraceIOMask.append(f'# asynSetTraceIOMask("{motorPortName}", 0, 0)')
             asynSetTraceMask.append(f'# asynSetTraceMask("{motorPortName}", 0, 9)')
         ImsMDrivePlusCreateController = "\n".join(createController)
@@ -379,14 +394,14 @@ def genIOCconfig(motorsByAddress: dict, imsPath: Path, outpath: Path):
         # print(ImsMDrivePlusCreateController)
         cmdContent = templateCmd.format(**locals())
         # write the file to disk
-        with open(cmdPath, 'w') as fd:
+        with open(cmdPath, "w") as fd:
             fd.write(cmdContent)
         cmdPath.chmod(0o755)
         print(f"Wrote '{cmdPath.relative_to(Path().resolve())}'.")
         basic_asyn_motor, ims_extra = substitutions(motors)
         subsContent = templateSubs.format(**locals())
         # write the file to disk
-        with open(substitutionsPath, 'w') as fd:
+        with open(substitutionsPath, "w") as fd:
             fd.write(subsContent)
         print(f"Wrote '{substitutionsPath.relative_to(Path().resolve())}'.")
 
@@ -412,15 +427,19 @@ def getMotorsByAddress(motors: List[dict]):
 
 def setEM(host, port, deviceName, value):
     import socket
+
     try:
         port = int(port, 0)
     except TypeError:
         pass
     print(f"Toggling Echo Mode (EM) for {deviceName} on {host}:{port}:")
+
     def send(sock, msg: str):
         sock.sendall(bytes(msg + "\n", "ascii"))
+
     def recv(sock):
         return str(sock.recv(128).strip(), "ascii")
+
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         # Connect to server and send data
         s.connect((host, port))
@@ -429,11 +448,11 @@ def setEM(host, port, deviceName, value):
         print("Current Echo Mode:", em)
         emNew = max(1, min(2, value))
         print("Setting Echo Mode to", emNew, "...")
-        send(s, f"{deviceName} EM {emNew}") # does not return anything in EM=1
+        send(s, f"{deviceName} EM {emNew}")  # does not return anything in EM=1
         send(s, f"{deviceName} PR EM")
         em = recv(s)
         if not em and emNew == 1:
-            em = recv(s) # try again
+            em = recv(s)  # try again
         print("New echo mode:", em)
 
 
@@ -488,6 +507,7 @@ def main(args: List[str] = None):
     motorsByAddress = getMotorsByAddress(motors)
     genIOCconfig(motorsByAddress, args.imsPath, outpath)
     print("done.")
+
 
 if __name__ == "__main__":
     main()
