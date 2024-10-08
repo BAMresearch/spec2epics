@@ -35,7 +35,7 @@ dbLoadTemplate "{substitutionsPath}"
 
 # Configure asyn communication port, first
 # drvAsynIPPortConfigure(IOPortName, port, priority, disable auto-connect, no process EOS)
-drvAsynIPPortConfigure("{portName}", "{addressWithPort}", 0, 0, 0 )
+{drvAsynIPPortConfigure}
 
 # Configure one controller per motor, each controller just has 1 axis
 # motorPortName, portName, deviceName, movingPollPeriod, idlePollPeriod

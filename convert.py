@@ -90,6 +90,23 @@ def configureParser() -> argparse.ArgumentParser:
                 Read from environment variable IMS_PATH if not specified on command line.
             """),
         )
+    def verifyList(arg):
+        res = [grp.split("+") for grp in arg.split(",")]
+        return tuple([grp for grp in res if len(grp) > 1]) # filter out single element lists
+    def needsMergeList(parser):
+        parser.add_argument(
+            "-m",
+            "--merge",
+            type=verifyList,
+            default=environ.get("MERGE", ""),
+            metavar="<portName list>",
+            required=False,
+            help=("""
+                A list of port numbers or port names to merge into a single IOC config file.
+                Can also be a list of lists (separated by semicolon) if multiple groups should be
+                merged individually. Example: 'a+b,c+d+e' merges a & b and c, d & e in separate IOCs.
+            """),
+        )
 
     # process input arguments
     parser = argparse.ArgumentParser(
@@ -107,6 +124,7 @@ def configureParser() -> argparse.ArgumentParser:
     needsConfigAdm(generateParser)
     needsLimits(generateParser)
     needsImsPath(generateParser)
+    needsMergeList(generateParser)
     emParser = subparsers.add_parser("echomode", help="Set Echo Mode (EM) on a given port.")
     emParser.set_defaults(mode="echomode")
     emParser.add_argument(
@@ -345,14 +363,14 @@ def substitutions(motors):
     return basic_asyn_motor, ims_extra
 
 
-def getPortName(addressWithPort):
+def getPortName(addressWithPort: str):
     host, port = addressWithPort.split(":")
     port = int(port, 0)
-    portName = f"moxa{port%100}"
+    portName = f"moxa{str(port)[-2:]}"
     return host, port, portName
 
 
-def genIOCconfig(motorsByAddress: dict, imsPath: Path, outpath: Path):
+def genIOCconfig(motorsByAddress: dict, imsPath: Path, outpath: Path, mergePorts: List=None):
     # pprint(motorsByAddress)
     outpath.mkdir(mode=0o755, exist_ok=True)
     # find IOC binary and other paths
@@ -399,23 +417,42 @@ def genIOCconfig(motorsByAddress: dict, imsPath: Path, outpath: Path):
     # print("New motor db:", motorDbPathNew)
     motorDbPathNew.write_text("".join(motorDb))
 
+    print(f"{mergePorts=}")
+    merged = [ [] for _ in range(len(mergePorts)) ]
+    motorGroups = dict()
     for addressWithPort, motors in motorsByAddress.items():
         _, port, portName = getPortName(addressWithPort)
+        motorGroups[portName] = motorGroups.get(portName, []) + motors
+        for i, merge in enumerate(mergePorts):
+            if any([item for item in merge if str(port) == item or portName == item]):
+                merged[i].append(portName)
+    for group in merged:
+        mergedName = "".join([group[0]]+[name[-2:] for name in group[1:]])
+        for portName in group:
+            motorGroups[mergedName] = motorGroups.get(mergedName, []) + motorGroups[portName]
+    pprint(motorGroups)
+
+    for portName, motors in motorGroups.items():
         substitutionsPath = f"{portName}.substitutions"
         substitutionsPath = (outpath / f"{substitutionsPath}").resolve()
         cmdPath = (outpath / f"{portName}.cmd").resolve()
-        # print(f'drvAsynIPPortConfigure("{portName}", "{addressWithPort}", 0, 0, 0 )')
+        drvAsynIPPortConfigure = set() # filters duplicates
         createController = []
         asynSetTraceIOMask = []
         asynSetTraceMask = []
         for motor in motors:
+            _, _, portName = getPortName(motor["address"])
             dn = motor["devName"]
             motorPortName = f"IMS{dn}"
+            drvAsynIPPortConfigure.add(
+                f'drvAsynIPPortConfigure("{portName}", "{motor["address"]}", 0, 0, 0 )'
+            )
             createController.append(
                 f'ImsMDrivePlusCreateController("{motorPortName}", "{portName}", "{dn}", 200, 5000)'
             )
             asynSetTraceIOMask.append(f'# asynSetTraceIOMask("{motorPortName}", 0, 0)')
             asynSetTraceMask.append(f'# asynSetTraceMask("{motorPortName}", 0, 9)')
+        drvAsynIPPortConfigure = "\n".join(drvAsynIPPortConfigure)
         ImsMDrivePlusCreateController = "\n".join(createController)
         asynSetTraceIOMask = "\n".join(asynSetTraceIOMask)
         asynSetTraceMask = "\n".join(asynSetTraceMask)
@@ -533,7 +570,7 @@ def main(args: List[str] = None):
     print("Generate and store IOC cmd file for each motor:")
     outpath = Path("generated")
     motorsByAddress = getMotorsByAddress(motors)
-    genIOCconfig(motorsByAddress, args.imsPath, outpath)
+    genIOCconfig(motorsByAddress, args.imsPath, outpath, mergePorts=args.merge)
     print("done.")
 
 
