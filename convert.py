@@ -395,6 +395,23 @@ def customMotorDb(envPath: Path, outpath: Path):
     motorDbPathNew.write_text("".join(motorDb))
     return motorDbPathNew
 
+def assembleMotorGroups(motorsByAddress: dict, mergePorts: List):
+    print(f"{mergePorts=}")
+    merged = [ [] for _ in range(len(mergePorts)) ]
+    motorGroups = dict()
+    for addressWithPort, motors in motorsByAddress.items():
+        _, port, portName = getPortName(addressWithPort)
+        motorGroups[portName] = motorGroups.get(portName, []) + motors
+        for i, merge in enumerate(mergePorts):
+            if any([item for item in merge if str(port) == item or portName == item]):
+                merged[i].append(portName)
+    for group in merged:
+        mergedName = "".join([group[0]]+[name[-2:] for name in group[1:]])
+        for portName in group:
+            motorGroups[mergedName] = motorGroups.get(mergedName, []) + motorGroups[portName]
+    # pprint(motorGroups)
+    return motorGroups
+
 def genIOCconfig(motorsByAddress: dict, imsPath: Path, outpath: Path, mergePorts: List=None):
     # pprint(motorsByAddress)
     outpath.mkdir(mode=0o755, exist_ok=True)
@@ -420,21 +437,7 @@ def genIOCconfig(motorsByAddress: dict, imsPath: Path, outpath: Path, mergePorts
     # print(templateSubs)
     # print(f"{binPath=}")
     motorDbPathNew = customMotorDb(envPath, outpath)
-
-    print(f"{mergePorts=}")
-    merged = [ [] for _ in range(len(mergePorts)) ]
-    motorGroups = dict()
-    for addressWithPort, motors in motorsByAddress.items():
-        _, port, portName = getPortName(addressWithPort)
-        motorGroups[portName] = motorGroups.get(portName, []) + motors
-        for i, merge in enumerate(mergePorts):
-            if any([item for item in merge if str(port) == item or portName == item]):
-                merged[i].append(portName)
-    for group in merged:
-        mergedName = "".join([group[0]]+[name[-2:] for name in group[1:]])
-        for portName in group:
-            motorGroups[mergedName] = motorGroups.get(mergedName, []) + motorGroups[portName]
-    pprint(motorGroups)
+    motorGroups = assembleMotorGroups(motorsByAddress, mergePorts if mergePorts else [])
 
     for portName, motors in motorGroups.items():
         substitutionsPath = f"{portName}.substitutions"
@@ -566,7 +569,7 @@ def main(args: List[str] = None):
     print(json.dumps(motors, indent=4))
 
     motors_selected = ("oldysam", "oldzsam")
-    print(f"Motor config of {motors_selected} for EPICS substitutions file:")
+    print(f"Example motor config of {motors_selected} for EPICS substitutions file:")
     motors_selected = [motor for motor in motors if motor["name"] in motors_selected]
     basic_asyn_motor, ims_extra = substitutions(motors_selected)
     print(basic_asyn_motor)
