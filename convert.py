@@ -360,9 +360,9 @@ def genIOCconfig(motorsByAddress: dict, imsPath: Path, outpath: Path):
     binPath = list(iocPath.glob("**/bin/**/ims"))
     envPath = list(iocPath.glob("**/envPaths"))
     if not binPath or not binPath[0].is_file():
-        raise RuntimeError(f"IOC binary could not be within {imsPath}!")
+        raise RuntimeError(f"IOC binary could not be found within {imsPath}!")
     if not envPath or not envPath[0].is_file():
-        raise RuntimeError(f"envPath file could not be within {imsPath}!")
+        raise RuntimeError(f"envPaths file could not be found within {imsPath}!")
     binPath = binPath[0].resolve()
     envPath = envPath[0].resolve()
     # read templates
