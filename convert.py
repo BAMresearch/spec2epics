@@ -370,6 +370,31 @@ def getPortName(addressWithPort: str):
     return host, port, portName
 
 
+def customMotorDb(envPath: Path, outpath: Path):
+    # print(f"{envPath=}")
+    # find default motor record definition
+    with open(envPath) as fd:
+        motorPath = [line for line in fd.readlines() if "MOTOR" in line]
+    # print(motorPath)
+    if motorPath:
+        motorPath = motorPath[0].split('"')[3]
+    motorDbPath = Path(motorPath) / "db/basic_asyn_motor.db"
+    # print(f"Found {motorDbPath=}", motorDbPath.is_file())
+    # adjust motor record, add some fields
+    with open(motorDbPath) as fd:
+        motorDb = fd.readlines()
+    idx = [i for i, line in enumerate(motorDb) if "field(INIT" in line]
+    if idx:
+        idx = idx[0]
+        motorDb.insert(idx, "\tfield(HVEL,\"$(HVEL)\")\n")
+        motorDb.insert(idx, "\tfield(OFF,\"$(OFF)\")\n")
+    # pprint(motorDb)
+    # write new motor record definition, path is reused in template later
+    motorDbPathNew = (outpath / motorDbPath.name).resolve()
+    # print("New motor db:", motorDbPathNew)
+    motorDbPathNew.write_text("".join(motorDb))
+    return motorDbPathNew
+
 def genIOCconfig(motorsByAddress: dict, imsPath: Path, outpath: Path, mergePorts: List=None):
     # pprint(motorsByAddress)
     outpath.mkdir(mode=0o755, exist_ok=True)
@@ -394,28 +419,7 @@ def genIOCconfig(motorsByAddress: dict, imsPath: Path, outpath: Path, mergePorts
     # print("templateSubs:")
     # print(templateSubs)
     # print(f"{binPath=}")
-    # print(f"{envPath=}")
-    # find default motor record definition
-    with open(envPath) as fd:
-        motorPath = [line for line in fd.readlines() if "MOTOR" in line]
-    # print(motorPath)
-    if motorPath:
-        motorPath = motorPath[0].split('"')[3]
-    motorDbPath = Path(motorPath) / "db/basic_asyn_motor.db"
-    # print(f"Found {motorDbPath=}", motorDbPath.is_file())
-    # adjust motor record, add some fields
-    with open(motorDbPath) as fd:
-        motorDb = fd.readlines()
-    idx = [i for i, line in enumerate(motorDb) if "field(INIT" in line]
-    if idx:
-        idx = idx[0]
-        motorDb.insert(idx, "\tfield(HVEL,\"$(HVEL)\")\n")
-        motorDb.insert(idx, "\tfield(OFF,\"$(OFF)\")\n")
-    # pprint(motorDb)
-    # write new motor record definition, path is reused in template later
-    motorDbPathNew = (outpath / motorDbPath.name).resolve()
-    # print("New motor db:", motorDbPathNew)
-    motorDbPathNew.write_text("".join(motorDb))
+    motorDbPathNew = customMotorDb(envPath, outpath)
 
     print(f"{mergePorts=}")
     merged = [ [] for _ in range(len(mergePorts)) ]
