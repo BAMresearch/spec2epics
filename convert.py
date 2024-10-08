@@ -373,17 +373,19 @@ def genIOCconfig(motorsByAddress: dict, imsPath: Path, outpath: Path):
     with open("substitutions.template") as fd:
         templateSubs = fd.read()
     # for testing
-    print("templateSubs:")
-    print(templateSubs)
+    # print("templateSubs:")
+    # print(templateSubs)
     # print(f"{binPath=}")
-    print(f"{envPath=}")
+    # print(f"{envPath=}")
+    # find default motor record definition
     with open(envPath) as fd:
         motorPath = [line for line in fd.readlines() if "MOTOR" in line]
-    print(motorPath)
+    # print(motorPath)
     if motorPath:
         motorPath = motorPath[0].split('"')[3]
     motorDbPath = Path(motorPath) / "db/basic_asyn_motor.db"
-    print(motorDbPath, motorDbPath.is_file())
+    # print(f"Found {motorDbPath=}", motorDbPath.is_file())
+    # adjust motor record, add some fields
     with open(motorDbPath) as fd:
         motorDb = fd.readlines()
     idx = [i for i, line in enumerate(motorDb) if "field(INIT" in line]
@@ -391,9 +393,10 @@ def genIOCconfig(motorsByAddress: dict, imsPath: Path, outpath: Path):
         idx = idx[0]
         motorDb.insert(idx, "\tfield(HVEL,\"$(HVEL)\")\n")
         motorDb.insert(idx, "\tfield(OFF,\"$(OFF)\")\n")
-    pprint(motorDb)
+    # pprint(motorDb)
+    # write new motor record definition, path is reused in template later
     motorDbPathNew = (outpath / motorDbPath.name).resolve()
-    print(motorDbPathNew)
+    # print("New motor db:", motorDbPathNew)
     motorDbPathNew.write_text("".join(motorDb))
 
     for addressWithPort, motors in motorsByAddress.items():
